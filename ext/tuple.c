@@ -129,11 +129,12 @@ static VALUE tuple_dump(VALUE self, VALUE tuple) {
 
       if (rb_obj_class(item) == rb_cTime) {
         item = rb_funcall(item, rb_intern("getgm"), 0);
-        item = rb_funcall(item, rb_intern("strftime"), 1, rb_str_new2("%Y/%m/%d %H:%M:%S +0000"));
+        item = rb_funcall(item, rb_intern("strftime"), 1, rb_str_new2("%Y-%m-%d %H:%M:%S +0000"));
       } else {
-        item = rb_funcall(item, rb_intern("strftime"), 1, rb_str_new2("%Y/%m/%d"));
+        item = rb_funcall(item, rb_intern("strftime"), 1, rb_str_new2("%Y-%m-%d"));
       }
       len = RSTRING_LEN(item);
+      RB_GC_GUARD(item);
       rb_str_cat(data, RSTRING_PTR(item), len);
 
       null_pad(data, len);
