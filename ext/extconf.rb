@@ -3,7 +3,7 @@ require 'mkmf'
 case RUBY_VERSION
 when /\A1\.8/
   $CFLAGS += ' -DRUBY_1_8_x'
-when /\A1\.9/,/\A2\.0\.0/
+when /\A1\.9/,/\A2\./
   $CFLAGS += ' -DRUBY_1_9_x'
 else
   raise "unsupported Ruby version: #{RUBY_VERSION}"
