@@ -1,4 +1,5 @@
 #include "ruby.h"
+#include "ruby_internal.h"
 #include <netinet/in.h>
 
 VALUE mTuple;
@@ -14,8 +15,6 @@ VALUE rb_cDate;
 #define INTN_SORT    8 // Integer (Negative)
 #define FALSE_SORT   1 // FalseClass
 #define NIL_SORT     0 // NilClass
-
-#define BDIGITS(x) ((BDIGIT*)RBIGNUM(x)->digits)
 
 static void null_pad(VALUE data, int len) {
   static u_int8_t null = 0;
@@ -59,7 +58,7 @@ static VALUE tuple_dump(VALUE self, VALUE tuple) {
 
   if (TYPE(tuple) != T_ARRAY) tuple = rb_ary_new4(1, &tuple);
 
-#if defined(RUBY_1_9_x)
+#if defined(RUBY_1_9_x) || defined(RUBY_2_2_x)
   for (i = 0; i < RARRAY_LEN(tuple); i++) {
       item = RARRAY_PTR(tuple)[i];
 #elif defined(RUBY_1_8_x)
@@ -87,7 +86,10 @@ static VALUE tuple_dump(VALUE self, VALUE tuple) {
       digit = htonl(sign ? digit : UINT_MAX - digit);
       rb_str_cat(data, (char*)&digit, sizeof(digit));
     } else if (TYPE(item) == T_BIGNUM) {
-#if defined(RUBY_1_9_x)
+#if defined(RUBY_2_2_x)
+      sign = BIGNUM_SIGN(item);
+      len  = BIGNUM_LEN(item);
+#elif defined(RUBY_1_9_x) || defined(RUBY_2_2_x)
       sign = RBIGNUM_SIGN(item);
       len  = RBIGNUM_LEN(item);
 #elif defined(RUBY_1_8_x)
@@ -100,7 +102,9 @@ static VALUE tuple_dump(VALUE self, VALUE tuple) {
       header[3] = sign ? len : UCHAR_MAX - len;
       rb_str_cat(data, (char*)&header, sizeof(header));
 
-#if defined(RUBY_1_9_x)
+#if defined(RUBY_2_2_x)
+      digits = BIGNUM_DIGITS(item);
+#elif defined(RUBY_1_9_x)
       digits = RBIGNUM_DIGITS(item);
 #elif defined(RUBY_1_8_x)
       digits = BDIGITS(item);
@@ -159,7 +163,7 @@ static VALUE tuple_dump(VALUE self, VALUE tuple) {
 }
 
 static VALUE empty_bignum(int sign, int len) {
-#if defined(RUBY_1_9_x)
+#if defined(RUBY_1_9_x) || defined(RUBY_2_2_x)
   return rb_big_new(len, sign);
 #elif defined(RUBY_1_8_x)
   /* Create an empty bignum with the right number of digits. */
@@ -200,7 +204,9 @@ static VALUE tuple_parse(void **data, int data_len) {
       len   = sign ? header[3] : (UCHAR_MAX - header[3]);
 
       item = empty_bignum(sign, len);
-#if defined(RUBY_1_9_x)
+#if defined(RUBY_2_2_x)
+      digits = BIGNUM_DIGITS(item);
+#elif defined(RUBY_1_9_x)
       digits = RBIGNUM_DIGITS(item);
 #elif defined(RUBY_1_8_x)
       digits = BDIGITS(item);

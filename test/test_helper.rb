@@ -1,5 +1,5 @@
 require 'rubygems'
-require 'test/unit'
+require 'minitest/autorun'
 require 'shoulda'
 require 'mocha/setup'
 
@@ -16,7 +16,4 @@ if not [].respond_to?(:shuffle)
       result 
     end
   end
-end
-
-class Test::Unit::TestCase
 end

@@ -1,30 +1,14 @@
-require 'rake'
+# -*- mode: ruby; encoding: utf-8 -*-
+require "bundler/gem_tasks"
 require 'rake/testtask'
 require 'rdoc/task'
 
-begin
-  require 'jeweler'
-  Jeweler::Tasks.new do |s|
-    s.name = "tuple"
-    s.summary = %Q{Tuple serialization functions.}
-    s.email = "code@justinbalthrop.com"
-    s.homepage = "http://github.com/ninjudd/tuple"
-    s.description = "Fast, binary-sortable serialization for arrays of simple Ruby types."
-    s.authors = ["Justin Balthrop", "Ash Moran"]
-    s.files = ["README.rdoc", "VERSION.yml", "ext/tuple.c", "ext/extconf.rb", "test/test_helper.rb", "test/tuple_test.rb"]
-    s.extensions = ["ext/extconf.rb"]
-    s.require_paths = ["ext"]
-  end
-  Jeweler::GemcutterTasks.new
-rescue LoadError
-  puts "Jeweler not available. Install it with: sudo gem install technicalpickles-jeweler -s http://gems.github.com"
-end
-
 Rake::TestTask.new do |t|
-  t.libs << "ext"
-  t.pattern = 'test/**/*_test.rb'
+  t.libs << "ext" << 'test'
+  t.test_files = FileList['test/*_test.rb']
   t.verbose = false
 end
+task test: 'ext/tuple.so'
 
 Rake::RDocTask.new do |rdoc|
   rdoc.rdoc_dir = 'rdoc'
@@ -44,13 +28,17 @@ begin
 rescue LoadError
 end
 
+file "ext/Makefile" do
+  Dir.chdir('ext') { ruby('extconf.rb') }
+end
+
+file "ext/tuple.so" => "ext/Makefile" do
+  Dir.chdir('ext') { sh("make") }
+end
+
 desc "Clean"
 task :clean do
-  include FileUtils
-  Dir.chdir('ext') do
-    rm(Dir.glob('*') - ['tuple.c', 'extconf.rb'])
-  end
-  rm_rf 'pkg'
+  Dir.chdir('ext') { rm_f(%w{Makefile tuple.o tuple.so}) }
 end
 
 task :default => :test

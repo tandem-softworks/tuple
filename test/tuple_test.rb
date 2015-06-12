@@ -1,4 +1,4 @@
-require File.dirname(__FILE__) + '/test_helper'
+require 'test_helper'
 
 class Time
   def ==(other)
@@ -7,7 +7,7 @@ class Time
   end
 end
 
-class TupleTest < Test::Unit::TestCase
+class TupleTest < Minitest::Test
   should "dump and load arrays of simple types" do
     t = [1, true, :foo, "foo", -1001, false, nil, Time.now, Date.today - 7, [:foo, 1, 4, nil]]
     assert_equal t, Tuple.load(Tuple.dump(t))
