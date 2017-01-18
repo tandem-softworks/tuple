@@ -3,7 +3,7 @@ require 'minitest/autorun'
 require 'shoulda'
 require 'mocha/setup'
 
-$LOAD_PATH.unshift(File.dirname(__FILE__) + '/../ext')
+$LOAD_PATH.unshift(File.dirname(__FILE__) + '/../lib')
 require 'tuple'
 
 if not [].respond_to?(:shuffle)

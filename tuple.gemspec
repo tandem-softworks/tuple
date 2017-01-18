@@ -1,10 +1,10 @@
 # -*- encoding: utf-8 -*-
 Gem::Specification.new do |s|
   s.name = %q{tuple}
-  s.version = '0.3.0'
+  s.version = '0.4.0'
 
   s.authors = [%q{Justin Balthrop}, %q{Ash Moran}, %q{topac}, %q{Jörg Schray}]
-  s.description = %q{Fast, binary-sortable serialization for arrays of simple Ruby types.}
+  s.description = %q{Fast (for RUBY_VERSION < 2.3), binary-sortable serialization for arrays of simple Ruby types. Pure ruby implementation for RUBY_VERSION >= 2.3.}
   s.email = %q{code@justinbalthrop.com}
   s.extensions = [%q{ext/extconf.rb}]
 
@@ -12,13 +12,12 @@ Gem::Specification.new do |s|
   s.files         = `git ls-files`.split("\n") - s.extra_rdoc_files
   s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
   s.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
-  s.require_paths = %w{ext}
 
   s.homepage = %q{http://github.com/ninjudd/tuple}
-  s.require_paths = [%q{ext}]
 
   s.summary = %q{Tuple serialization functions.}
 
   s.add_development_dependency "rake"
+  s.add_development_dependency "rake-compiler"
   s.add_development_dependency "minitest"
 end
