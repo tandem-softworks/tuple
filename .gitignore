@@ -1,3 +1,3 @@
 pkg
-ext/*.o
-ext/*.so
+tmp
+*.so

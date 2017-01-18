@@ -5,7 +5,7 @@ require 'rake/testtask'
 require 'rdoc/task'
 
 Rake::ExtensionTask.new('tuple') do |ext|
-  ext.ext_dir = "ext"
+  ext.lib_dir = "lib/tuple/binary"
 end
 
 Rake::TestTask.new do |t|
