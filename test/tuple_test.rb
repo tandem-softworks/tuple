@@ -8,27 +8,35 @@ class Time
 end
 
 class TupleTest < Minitest::Test
+  def tuple_load(dump)
+    Tuple.load(dump)
+  end
+
+  def tuple_dump(tuple)
+    Tuple.dump(tuple)
+  end
+
   should "dump and load arrays of simple types" do
     t = [1, true, :foo, "foo", -1001, false, nil, Time.now, Date.today - 7, [:foo, 1, 4, nil]]
-    assert_equal t, Tuple.load(Tuple.dump(t))
+    assert_equal t, tuple_load(tuple_dump(t))
   end
-  
+
   should "dump, load, and sort fixnums and bignums" do
     t = [2**64, 2**38, 2**32, 2**32 - 1, 2**31, 2**31 - 1, 1, 0]
     t = t + t.reverse.collect {|n| -n}
-    assert_equal t, Tuple.load(Tuple.dump(t))
-    assert_equal t.reverse, t.sort_by {|i| Tuple.dump(i)}
+    assert_equal t, tuple_load(tuple_dump(t))
+    assert_equal t.reverse, t.sort_by {|i| tuple_dump(i)}
   end
 
   should "convert single value into array" do
-    assert_equal [1], Tuple.load(Tuple.dump(1))
+    assert_equal [1], tuple_load(tuple_dump(1))
   end
 
   should "dump times consistently" do
     t = '2009-10-15 1:23:45 PM'
-    tuple = Tuple.dump(Time.parse(t))
+    tuple = tuple_dump(Time.parse(t))
     100000.times do
-      assert_equal tuple, Tuple.dump(Time.parse(t))
+      assert_equal tuple, tuple_dump(Time.parse(t))
     end
   end
 
@@ -87,10 +95,52 @@ class TupleTest < Minitest::Test
       [today + 1],
       [true]
     ]
-    assert_equal expected, tuples.sort_by {|t| Tuple.dump(t)}
+    assert_equal expected, tuples.sort_by {|t| tuple_dump(t)}
 
     100.times do
-      assert_equal expected, tuples.shuffle.sort_by {|t| Tuple.dump(t)}
+      assert_equal expected, tuples.shuffle.sort_by {|t| tuple_dump(t)}
     end
-  end 
+  end
+
+  should "raise type error for unsupported elements" do
+    exception = assert_raises(TypeError) do
+      tuple_dump(1.0)
+    end
+    assert_equal("invalid type Float in tuple",exception.message)
+  end
+end
+
+if defined?(Tuple::Binary)
+  require 'tuple/ruby/tuple'
+  class TupleBinaryRubyTest < TupleTest
+    module Binary
+      extend Tuple::Binary
+    end
+    module Ruby
+      extend Tuple::Ruby
+    end
+
+    def tuple_load(dump)
+      Binary.load(dump)
+    end
+    def tuple_dump(tuple)
+      Ruby.dump(tuple)
+    end
+  end
+
+  class TupleRubyBinaryTest < TupleTest
+    module Binary
+      extend Tuple::Binary
+    end
+    module Ruby
+      extend Tuple::Ruby
+    end
+
+    def tuple_load(dump)
+      Ruby.load(dump)
+    end
+    def tuple_dump(tuple)
+      Binary.dump(tuple)
+    end
+  end
 end

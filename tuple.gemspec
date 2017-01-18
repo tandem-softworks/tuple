@@ -6,7 +6,7 @@ Gem::Specification.new do |s|
   s.authors = [%q{Justin Balthrop}, %q{Ash Moran}, %q{topac}, %q{Jörg Schray}]
   s.description = %q{Fast (for RUBY_VERSION < 2.3), binary-sortable serialization for arrays of simple Ruby types. Pure ruby implementation for RUBY_VERSION >= 2.3.}
   s.email = %q{code@justinbalthrop.com}
-  s.extensions = [%q{ext/extconf.rb}]
+  s.extensions = %w{ext/tuple/extconf.rb}
 
   s.extra_rdoc_files = %w{LICENSE README.rdoc}
   s.files         = `git ls-files`.split("\n") - s.extra_rdoc_files

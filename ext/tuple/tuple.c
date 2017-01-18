@@ -1,13 +1,15 @@
 #include "ruby.h"
+
+VALUE rb_cDate;
+VALUE rb_cTime;
+
+#if defined(TUPLE_BINARY)
 #include "ruby_internal.h"
 #include <netinet/in.h>
 
-VALUE mTuple;
-VALUE rb_cDate;
-
 #define TRUE_SORT  255 // TrueClass
 #define TUPLE_SORT 192 // Array
-#define TUPLE_END  191 // For nested tuples 
+#define TUPLE_END  191 // For nested tuples
 #define TIME_SORT  128 // Time
 #define SYM_SORT    64 // Symbol
 #define STR_SORT    32 // String
@@ -26,7 +28,6 @@ static void null_pad(VALUE data, int len) {
   }
 }
 
-
 u_int32_t split64(int64_t num, int word) {
   u_int32_t *split = (u_int32_t*)(void*)&num;
 
@@ -36,8 +37,6 @@ u_int32_t split64(int64_t num, int word) {
 
   return split[word];
 }
-
-
 
 /*
  * call-seq:
@@ -75,7 +74,7 @@ static VALUE tuple_dump(VALUE self, VALUE tuple) {
       len = fixnum > UINT_MAX ? 2 : 1;
       header[2] = sign ? INTP_SORT : INTN_SORT;
       header[3] = sign ? len : UCHAR_MAX - len;
-      rb_str_cat(data, (char*)&header, sizeof(header));      
+      rb_str_cat(data, (char*)&header, sizeof(header));
 
       if (len == 2) {
         digit = split64(fixnum, 1);
@@ -125,7 +124,7 @@ static VALUE tuple_dump(VALUE self, VALUE tuple) {
       rb_str_cat(data, (char*)&header, sizeof(header));
       len = RSTRING_LEN(item);
       rb_str_cat(data, RSTRING_PTR(item), len);
-      
+
       null_pad(data, len);
     } else if (rb_obj_class(item) == rb_cTime || rb_obj_class(item) == rb_cDate) {
       header[2] = TIME_SORT;
@@ -146,17 +145,17 @@ static VALUE tuple_dump(VALUE self, VALUE tuple) {
       header[2] = TUPLE_SORT;
       rb_str_cat(data, (char*)&header, sizeof(header));
 
-      rb_str_concat(data, tuple_dump(mTuple, item));
+      rb_str_concat(data, tuple_dump(self, item));
 
       header[2] = TUPLE_END;
-      rb_str_cat(data, (char*)&header, sizeof(header));      
-    } else {        
+      rb_str_cat(data, (char*)&header, sizeof(header));
+    } else {
       if      (item == Qnil)   header[2] = NIL_SORT;
       else if (item == Qtrue)  header[2] = TRUE_SORT;
       else if (item == Qfalse) header[2] = FALSE_SORT;
       else    rb_raise(rb_eTypeError, "invalid type %s in tuple", rb_obj_classname(item));
-      
-      rb_str_cat(data, (char*)&header, sizeof(header));      
+
+      rb_str_cat(data, (char*)&header, sizeof(header));
     }
   }
   return data;
@@ -262,14 +261,18 @@ static VALUE tuple_load(VALUE self, VALUE data) {
   void* ptr = RSTRING_PTR(data);
   return tuple_parse(&ptr, RSTRING_LEN(data));
 }
+#endif /* defnied(TUPLE_BINARY) */
 
-VALUE mTuple;
 void Init_tuple() {
   rb_require("time");
   rb_require("date");
   rb_cDate = rb_const_get(rb_cObject, rb_intern("Date"));
+  rb_cTime = rb_const_get(rb_cObject, rb_intern("Time"));
 
-  mTuple = rb_define_module("Tuple");
-  rb_define_module_function(mTuple, "dump", tuple_dump, 1);
-  rb_define_module_function(mTuple, "load", tuple_load, 1);
+#if defined(TUPLE_BINARY)
+  VALUE mTuple = rb_define_module("Tuple");
+  VALUE mTupleBinary = rb_define_module_under(mTuple,"Binary");
+  rb_define_method(mTupleBinary, "dump", tuple_dump, 1);
+  rb_define_method(mTupleBinary, "load", tuple_load, 1);
+#endif
 }
