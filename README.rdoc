@@ -4,9 +4,14 @@ Tuple provides fast, binary-sortable serialization for arrays of simple Ruby typ
 means you do not have to deserialize your tuples to store them. This leads to significant
 performance benifits when using Tuples as keys for a BTree.
 
+As of version 0.4.0 (in this fork) a pure ruby implementation is included, which
+is used for ruby versions which are not supported by the C-implementation (as of
+this writing >= 2.3). Its use may be forced on installation by using the
+compiler flag -DPURE_RUBY. There seems to be no noticeble run time penalty.
+
 A Tuple is just an Array of any number of simple Ruby types. The following types are
 supported (listed in ascending sort order):
-  
+
 1. NilClass
 2. FalseClass
 3. Integer (Fixnum or Bignum)
@@ -15,7 +20,7 @@ supported (listed in ascending sort order):
 6. True
 
 == Usage:
-   
+
   require 'tuple'
 
   data = Tuple.dump([1, -43, :foo, "bar", true, false, nil])
@@ -27,6 +32,18 @@ supported (listed in ascending sort order):
 
   gem install tuple
 
+== Known Bugs and Limitations
+
+The binary serialization only supports the integer range -2**(32*255)+1 to
+2**(32*255)-1. An ArgumentError is raised in the ruby implementation if these
+boundaries are exceeded. The C-implementiation produces a result which is
+outside the correct sort order and cannot be loaded back correctly.
+
+== Build Status:
+
+{<img src="https://travis-ci.org/tandem-softworks/tuple.svg?branch=master" alt="Build Status" />}[https://travis-ci.org/tandem-softworks/tuple]
+
 == License:
 
 Copyright (c) 2009 Justin Balthrop; Published under The MIT License, see LICENSE
+Copyright (c) 2017 Jörg Schray; Published under The MIT License, see LICENSE

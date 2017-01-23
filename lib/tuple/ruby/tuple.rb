@@ -1,3 +1,5 @@
+# coding: utf-8
+# Copyright (c) 2017 Jörg Schray; Published under The MIT License, see LICENSE
 module Tuple
   module Ruby
     def dump(tuple)
@@ -39,6 +41,7 @@ module Tuple
               element = element >> 32
             end
           end
+          raise(ArgumentError,"integer too large for serialization") if words.size > 255
           PositiveIntegerHeader + [words.size,*words].pack("C"+ ("L>"*words.size))
         else
           words = []
@@ -46,6 +49,7 @@ module Tuple
             words.unshift((element-1).modulo(-2**32))
             element = -(-element >> 32)
           end
+          raise(ArgumentError,"integer too small for serialization") if words.size > 255
           NegativeIntegerHeader + [-words.size-1,*words].pack("C"+ ("L>"*words.size))
         end
       when String
@@ -111,6 +115,7 @@ module Tuple
         integer_header,word_size = header.unpack("a3c")
         case integer_header
         when PositiveIntegerHeader
+          word_size = 256 + word_size if word_size < 0
           result = 0
           while word_size > 0
             current_word,rest_dump = rest_dump.unpack("L>a*")
@@ -120,6 +125,7 @@ module Tuple
           [result,rest_dump]
         when NegativeIntegerHeader
           result = 1
+          word_size = -256 + word_size if word_size >= 0
           while word_size < -1
             current_word,rest_dump = rest_dump.unpack("L>a*")
             result = (result << 32) - current_word

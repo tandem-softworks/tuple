@@ -111,36 +111,15 @@ class TupleTest < Minitest::Test
 end
 
 if defined?(Tuple::Binary)
-  require 'tuple/ruby/tuple'
   class TupleBinaryRubyTest < TupleTest
-    module Binary
-      extend Tuple::Binary
-    end
-    module Ruby
-      extend Tuple::Ruby
-    end
-
-    def tuple_load(dump)
-      Binary.load(dump)
-    end
-    def tuple_dump(tuple)
-      Ruby.dump(tuple)
-    end
+    include TupleTestHelper
+    alias :tuple_load :tuple_load_binary
+    alias :tuple_dump :tuple_dump_ruby
   end
 
   class TupleRubyBinaryTest < TupleTest
-    module Binary
-      extend Tuple::Binary
-    end
-    module Ruby
-      extend Tuple::Ruby
-    end
-
-    def tuple_load(dump)
-      Ruby.load(dump)
-    end
-    def tuple_dump(tuple)
-      Binary.dump(tuple)
-    end
+    include TupleTestHelper
+    alias :tuple_load :tuple_load_ruby
+    alias :tuple_dump :tuple_dump_binary
   end
 end

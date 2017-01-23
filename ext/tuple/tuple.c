@@ -3,7 +3,7 @@
 VALUE rb_cDate;
 VALUE rb_cTime;
 
-#if defined(TUPLE_BINARY)
+#if defined(TUPLE_BINARY) && !defined(TUPLE_RUBY)
 #include "ruby_internal.h"
 #include <netinet/in.h>
 
@@ -261,7 +261,7 @@ static VALUE tuple_load(VALUE self, VALUE data) {
   void* ptr = RSTRING_PTR(data);
   return tuple_parse(&ptr, RSTRING_LEN(data));
 }
-#endif /* defnied(TUPLE_BINARY) */
+#endif /* defnied(TUPLE_BINARY) && !defined(TUPLE_RUBY) */
 
 void Init_tuple() {
   rb_require("time");
@@ -269,7 +269,7 @@ void Init_tuple() {
   rb_cDate = rb_const_get(rb_cObject, rb_intern("Date"));
   rb_cTime = rb_const_get(rb_cObject, rb_intern("Time"));
 
-#if defined(TUPLE_BINARY)
+#if defined(TUPLE_BINARY) && !defined(TUPLE_RUBY)
   VALUE mTuple = rb_define_module("Tuple");
   VALUE mTupleBinary = rb_define_module_under(mTuple,"Binary");
   rb_define_method(mTupleBinary, "dump", tuple_dump, 1);

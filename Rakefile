@@ -32,4 +32,10 @@ begin
 rescue LoadError
 end
 
+task :check_binary_installed do
+  unless File.exists?('lib/tuple/binary/tuple.so')
+    Rake.application.invoke_task('compile')
+  end
+end
+task :test => :check_binary_installed
 task :default => :test
