@@ -1,4 +1,4 @@
-require 'tuple/binary/tuple'
+require 'tuple.so'
 module Tuple
   begin
     include Binary

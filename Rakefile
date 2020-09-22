@@ -4,9 +4,7 @@ require "rake/extensiontask"
 require 'rake/testtask'
 require 'rdoc/task'
 
-Rake::ExtensionTask.new('tuple') do |ext|
-  ext.lib_dir = "lib/tuple/binary"
-end
+Rake::ExtensionTask.new('tuple')
 
 Rake::TestTask.new do |t|
   t.libs << "ext" << 'test'
@@ -33,7 +31,7 @@ rescue LoadError
 end
 
 task :check_binary_installed do
-  unless File.exists?('lib/tuple/binary/tuple.so')
+  unless File.exists?('lib/tuple.so')
     Rake.application.invoke_task('compile')
   end
 end

@@ -1,7 +1,7 @@
 # -*- encoding: utf-8 -*-
 Gem::Specification.new do |s|
   s.name = %q{tuple}
-  s.version = '1.0.0'
+  s.version = '1.0.1'
 
   s.authors = [%q{Justin Balthrop}, %q{Ash Moran}, %q{topac}, %q{Jörg Schray}]
   s.description = %q{Fast (for RUBY_VERSION < 2.3), binary-sortable serialization for arrays of simple Ruby types. Pure ruby implementation for RUBY_VERSION >= 2.3.}
